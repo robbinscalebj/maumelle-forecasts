@@ -37,12 +37,12 @@ sites_df <- sites |>
 
 
     #set up
-        
+        ref_date <- Sys.Date()
           gribs <- tidyr::expand_grid(ensemble = gefs_ensemble(),
                                cycle = "00",
-                               reference_datetime = Sys.Date(),
+                               reference_datetime = ref_date,
                                horizon = gefs_horizon()) |>
-            dplyr::mutate(url = gefs_urls(ensemble, reference_datetime,
+            dplyr::mutate(url = gefs_urls(ensemble, ref_date,
                                           horizon, cycle=cycle),
                           time = as.Date(Sys.Date() + dplyr::row_number()))|>
             slice_head(n=1)
@@ -74,8 +74,8 @@ df <- gdalcubes::stack_cube(gribs$url,
                       names_to = "variable",
                       values_to = "prediction") |>
   dplyr::ungroup()|>
-  write_csv(paste(here("GEFS_data/", paste("gefs_ens_", reference_datetime,".csv"))))
- 
+  write_csv(paste(here("GEFS_data/", paste("gefs_ens_", ref_date,".csv"))))
+
 print(paste0("Finished Date: ", gefs_dates[i],". Number ", i, "/", length(gefs_dates), " at ", Sys.time())) 
   }, error = function(e){cat("ERROR : ", conditionMessage(e), "\n")})
 }
